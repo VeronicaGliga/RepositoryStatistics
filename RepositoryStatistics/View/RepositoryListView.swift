@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RepositoryListView: View {
-    // ViewModel instance
+    
     @StateObject private var viewModel = RepositoryListViewModel(githubService: GithubServiceRepository(networkProvider: NetworkingService(baseURL: URL(string: "https://api.github.com")!)))
     
     var body: some View {
@@ -24,7 +24,9 @@ struct RepositoryListView: View {
                 await viewModel.fetchRepositories()
             }
             .alert(isPresented: .constant(viewModel.errorMessage != nil)) {
-                Alert(title: Text("Error"), message: Text(viewModel.errorMessage ?? ""), dismissButton: .default(Text("OK")))
+                Alert(title: Text("Error"), 
+                      message: Text(viewModel.errorMessage ?? ""),
+                      dismissButton: .default(Text("OK")))
             }
         }
     }

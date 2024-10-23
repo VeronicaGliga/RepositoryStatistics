@@ -9,19 +9,21 @@ import Foundation
 
 @MainActor
 class RepositoryListViewModel: ObservableObject {
-    // Published variable to store repositories
-    @Published var repositories: [Repository] = []
-    
-    // Error handling
-    @Published var errorMessage: String? = nil
+    // MARK: - Properties
     
     private let githubService: GithubServiceRepository
+    
+    @Published var repositories = [Repository]()
+    @Published var errorMessage: String?
+    
+    // MARK: - Init
     
     init(githubService: GithubServiceRepository) {
         self.githubService = githubService
     }
     
-    // Fetch repositories from the service
+    // MARK: - Functions
+    
     func fetchRepositories() async {
         do {
             // Fetch repositories from the GitHub service

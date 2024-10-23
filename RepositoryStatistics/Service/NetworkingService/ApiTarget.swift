@@ -7,14 +7,6 @@
 
 import Foundation
 
-enum HTTPMethod: String {
-    case get
-    case post
-    case put
-    case patch
-    case delete
-}
-
 enum ApiTarget {
     case getRepositories
     case getRepositoryIssues(owner: String, repository: String)

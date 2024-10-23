@@ -9,43 +9,39 @@ import Foundation
 
 @MainActor
 class RepositoryDetailViewModel: ObservableObject {
-    @Published var issueCounts: [IssueCount] = []
-    @Published var issues = [Issue]()
-    @Published var errorMessage: String? = nil
+    // MARK: - Properties
     
-    let githubService: GithubServiceIssues
+    private let githubService: GithubServiceIssues
+    
+    @Published var issueCounts = [IssueCount]()
+    @Published var issues = [Issue]()
+    @Published var errorMessage: String?
+    
+    // MARK: - Init
     
     init(githubService: GithubServiceIssues) {
         self.githubService = githubService
     }
     
-    struct IssueCount: Identifiable {
-        var id = UUID()
-        let weekStart: Date
-        let count: Int
-    }
+    // MARK: - Functions
     
     func fetchRepositoryIssues(for repository: Repository) async {
         do {
             // Fetch issues from the GitHub service
-            self.issues = try await githubService.fetchIssues(for: repository.name, owner: repository.owner.name)
+            issues = try await githubService.fetchIssues(for: repository.name, owner: repository.owner.name)
             
             // Process and group issues by week
-            self.issueCounts = self.groupIssuesByWeek(self.issues)
+            issueCounts = groupIssuesByWeek(issues)
         } catch {
-            self.errorMessage = "Failed to load issues"
+            errorMessage = "Failed to load issues"
         }
     }
     
     // Group issues by week
     private func groupIssuesByWeek(_ issues: [Issue]) -> [IssueCount] {
         let calendar = Calendar.current
-        
-        // Create a date formatter to parse issue creation dates
         let dateFormatter = ISO8601DateFormatter()
-        
-        // Group issues by start of the week (Sunday)
-        var groupedIssues: [Date: [Issue]] = [:]
+        var groupedIssues = [Date: [Issue]]()
         
         for issue in issues {
             if let createdAt = dateFormatter.date(from: issue.createdAt) {
@@ -59,6 +55,6 @@ class RepositoryDetailViewModel: ObservableObject {
             IssueCount(weekStart: weekStart, count: issues.count)
         }
         
-        return issueCounts.sorted(by: { $0.weekStart < $1.weekStart })
+        return issueCounts.sorted { $0.weekStart < $1.weekStart }
     }
 }
