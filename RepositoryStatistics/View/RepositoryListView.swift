@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RepositoryListView: View {
     // ViewModel instance
-    @StateObject private var viewModel = RepositoryListViewModel(githubService: GithubService())
+    @StateObject private var viewModel = RepositoryListViewModel(githubService: GithubServiceRepository(networkProvider: NetworkingService(baseURL: URL(string: "https://api.github.com")!)))
     
     var body: some View {
         NavigationView {

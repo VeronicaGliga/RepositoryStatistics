@@ -9,10 +9,10 @@ import Foundation
 
 struct Issue: Identifiable, Codable {
     let id: Int
-    let created_at: String
+    let createdAt: String
     
     enum CodingKeys: String, CodingKey {
         case id
-        case created_at
+        case createdAt = "created_at"
     }
 }

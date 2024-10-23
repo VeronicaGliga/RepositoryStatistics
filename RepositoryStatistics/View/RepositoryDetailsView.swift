@@ -10,7 +10,7 @@ import Charts
 
 struct RepositoryDetailsView: View {
     let repository: Repository
-        @StateObject private var viewModel = RepositoryDetailViewModel(githubService: GithubService())
+        @StateObject private var viewModel = RepositoryDetailViewModel(githubService: GithubServiceIssues(networkProvider: NetworkingService(baseURL: URL(string: "https://api.github.com")!)))
         
         var body: some View {
             VStack {

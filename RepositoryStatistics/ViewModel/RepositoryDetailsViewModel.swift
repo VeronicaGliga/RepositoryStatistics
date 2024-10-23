@@ -13,15 +13,15 @@ class RepositoryDetailViewModel: ObservableObject {
     @Published var issues = [Issue]()
     @Published var errorMessage: String? = nil
     
-    let githubService: GithubService
+    let githubService: GithubServiceIssues
     
-    init(githubService: GithubService) {
+    init(githubService: GithubServiceIssues) {
         self.githubService = githubService
     }
     
     struct IssueCount: Identifiable {
         var id = UUID()
-        let weekStart: Int
+        let weekStart: Date
         let count: Int
     }
     
@@ -45,11 +45,11 @@ class RepositoryDetailViewModel: ObservableObject {
         let dateFormatter = ISO8601DateFormatter()
         
         // Group issues by start of the week (Sunday)
-        var groupedIssues: [Int: [Issue]] = [:]
+        var groupedIssues: [Date: [Issue]] = [:]
         
         for issue in issues {
-            if let date = dateFormatter.date(from: issue.created_at) {
-                let weekStart = calendar.component(.weekOfYear, from: date)
+            if let createdAt = dateFormatter.date(from: issue.createdAt) {
+                let weekStart = calendar.dateInterval(of: .weekOfYear, for: createdAt)!.start
                 groupedIssues[weekStart, default: []].append(issue)
             }
         }

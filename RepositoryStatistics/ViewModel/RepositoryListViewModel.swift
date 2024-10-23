@@ -15,9 +15,9 @@ class RepositoryListViewModel: ObservableObject {
     // Error handling
     @Published var errorMessage: String? = nil
     
-    private let githubService: GithubService
+    private let githubService: GithubServiceRepository
     
-    init(githubService: GithubService) {
+    init(githubService: GithubServiceRepository) {
         self.githubService = githubService
     }
     
