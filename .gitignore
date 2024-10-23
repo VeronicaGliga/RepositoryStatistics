@@ -1,0 +1,6 @@
+# General
+.DS_Store
+
+# Xcode
+*.xcodeproj/xcuserdata/*
+*.xcodeproj/project.xcworkspace/xcuserdata/*
