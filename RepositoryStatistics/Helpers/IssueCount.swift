@@ -10,5 +10,5 @@ import Foundation
 struct IssueCount: Identifiable {
     var id = UUID()
     let weekStart: Date
-    let count: Int
+    let count: Double
 }

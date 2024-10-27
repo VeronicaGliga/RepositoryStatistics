@@ -52,7 +52,7 @@ class RepositoryDetailViewModel: ObservableObject {
         
         // Convert the dictionary into an array of IssueCount
         let issueCounts = groupedIssues.map { (weekStart, issues) in
-            IssueCount(weekStart: weekStart, count: issues.count)
+            IssueCount(weekStart: weekStart, count: Double(issues.count))
         }
         
         return issueCounts.sorted { $0.weekStart < $1.weekStart }
