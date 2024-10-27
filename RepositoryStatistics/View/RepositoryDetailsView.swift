@@ -18,6 +18,10 @@ struct RepositoryDetailsView: View {
     @State private var offset: CGFloat = 0.0
     @State private var showDataPointInfo = false
     
+    @State private var showSelectionBar = false
+    @State private var offsetX = 0.0
+    @State private var offsetY = 0.0
+    
     var body: some View {
         VStack {
             // Display key repository statistics
@@ -38,101 +42,109 @@ struct RepositoryDetailsView: View {
                     }
             } else {
                 Chart(viewModel.issueCounts) { issueCount in
-                    createLineMark(for: issueCount)
-                    // Adding PointMark for tap detection
-                    createPointMark(for: issueCount)
-                    
+                    LineMark(
+                        x: .value("Week", issueCount.weekStart),
+                        y: .value("Issues", issueCount.count)
+                    )
+                    .foregroundStyle(.cyan)
+                    .foregroundStyle(.pink.opacity(0.7))
+                    .interpolationMethod(.catmullRom)
+                    .lineStyle(.init(lineWidth: 2))
+                    .symbol {
+                        Circle()
+                            .fill(.cyan)
+                            .frame(width: 12, height: 12)
+                    }
                 }
                 .chartYAxisLabel("Number of Issues")
                 .chartXAxisLabel("Weeks")
                 .frame(height: 300)
                 .padding()
-                .chartYScale(domain: 0...(viewModel.issueCounts.map { $0.count }.max() ?? 1) * yScale) // Scale Y-axis
+                .chartYScale(domain: 0...(viewModel.issueCounts.map { Double($0.count) }.max() ?? 1) * yScale) // Scale Y-axis
                 .chartXScale(domain: computeXDomain())
+                .chartOverlay { pr in
+                    GeometryReader { geoProxy in
+                        Rectangle().foregroundStyle(Color.orange.gradient)
+                            .frame(width: 2, height: geoProxy.size.height * 0.95)
+                            .opacity(showSelectionBar ? 1.0 : 0.0)
+                            .offset(x: offsetX)
+                        
+                        Capsule()
+                            .foregroundStyle(.orange.gradient)
+                            .frame(width: 100, height: 50)
+                            .overlay {
+                                VStack {
+                                    if let selectedDataPoint {
+                                        Text(selectedDataPoint.formattedWeekStart)
+                                        Text("\(selectedDataPoint.count) issues")
+                                    }
+                                }
+                                .foregroundStyle(.white.gradient)
+                            }
+                            .opacity(showSelectionBar ? 1.0 : 0.0)
+                            .offset(x: offsetX - 50, y: offsetY - 50)
+                        
+                        Rectangle().fill(.clear).contentShape(Rectangle())
+                            .gesture(DragGesture().onChanged { value in
+                                if !showSelectionBar {
+                                    showSelectionBar = true
+                                }
+                                let origin = geoProxy[pr.plotAreaFrame].origin
+                                let location = CGPoint(
+                                    x: value.location.x - origin.x,
+                                    y: value.location.y - origin.y
+                                )
+                                offsetX = location.x
+                                offsetY = location.y
+                                
+                                let (date, _) = pr.value(at: location, as: (Date, Int).self) ?? (Date(), 0)
+                                if let issue = findIssue(on: date) {
+                                    selectedDataPoint = issue
+                                }
+                                
+                                print(selectedDataPoint)
+                            }
+                                .onEnded({ _ in
+                                    showSelectionBar = false
+                                }))
+                    }
+                }
                 .gesture(
                     MagnificationGesture()
                         .onChanged { value in
                             yScale = value.magnitude
                         }
                 )
-//                .gesture(
-//                    DragGesture()
-//                        .onChanged { value in
-//                            offset = value.translation.width
-//                        }
-//                        .onEnded { _ in
-//                            dateScale += offset / 1000 // Adjust factor as needed for smooth scaling
-//                            offset = 0
-//                        }
-//                )
+                //                .gesture(
+                //                    DragGesture()
+                //                        .onChanged { value in
+                //                            offset = value.translation.width
+                //                        }
+                //                        .onEnded { _ in
+                //                            dateScale += offset / 1000 // Adjust factor as needed for smooth scaling
+                //                            offset = 0
+                //                        }
+                //                )
             }
         }
         .navigationTitle(repository.name)
         .alert(isPresented: .constant(viewModel.errorMessage != nil)) {
             Alert(title: Text("Error"), message: Text(viewModel.errorMessage ?? ""), dismissButton: .default(Text("OK")))
         }
-        .overlay(
-            // Overlay to display additional information
-            Group {
-                if showDataPointInfo, let dataPoint = selectedDataPoint {
-                    dataPointOverlay(for: dataPoint)
-                }
-            }
-                .animation(.easeInOut, value: showDataPointInfo)
-        )
     }
     
-    // Function to create the line mark
-    private func createLineMark(for issueCount: IssueCount) -> some ChartContent {
-        LineMark(
-            x: .value("Date", issueCount.weekStart),
-            y: .value("Issues", issueCount.count)
-        )
-        .interpolationMethod(.catmullRom)
-        .foregroundStyle(.blue)
-        .lineStyle(.init(lineWidth: 2))
-        .symbol {
-            Circle()
-                .fill(.cyan)
-                .frame(width: 12, height: 12)
-        }
-    }
-    
-    // Function to create the point mark with tap gesture
-    private func createPointMark(for issueCount: IssueCount) -> some ChartContent {
-        PointMark(
-            x: .value("Date", issueCount.weekStart),
-            y: .value("Issues", issueCount.count)
-        )
-        .foregroundStyle(.red) // Make it invisible
-        .annotation(position: .overlay) {
-            Rectangle()
-                .foregroundStyle(.yellow) // Make the rectangle clear
-                .frame(width: 20, height: 20)
-//                .contentShape(Rectangle()) // Define the tappable area
-                .onTapGesture {
-                    selectedDataPoint = issueCount
-                    showDataPointInfo = true
-                }
-        }
-    }
-    
-    // Overlay view to display data point information
-    @ViewBuilder
-    private func dataPointOverlay(for dataPoint: IssueCount) -> some View {
-        VStack {
-            Text("Details for Selected Data Point")
-                .font(.headline)
-                .padding(.bottom, 2)
-            Text("Date: \(dataPoint.weekStart.formatted(date: .abbreviated, time: .omitted))")
-            Text("Issues: \(dataPoint.count)")
-        }
-        .padding()
-        .background(Color.gray.opacity(0.9))
-        .cornerRadius(10)
-        .shadow(radius: 5)
-        .onTapGesture {
-            showDataPointInfo = false // Dismiss overlay on tap
+    func findIssue(on date: Date) -> IssueCount? {
+        // Set up the date formatter to ignore the time component
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        
+        // Format the target date
+        let formattedTargetDate = dateFormatter.string(from: date)
+        
+        // Search for an issue with a matching formatted date
+        return viewModel.issueCounts.first { issue in
+            let formattedWeekStart = dateFormatter.string(from: issue.weekStart)
+            return formattedWeekStart == formattedTargetDate
         }
     }
     
@@ -150,49 +162,49 @@ struct RepositoryDetailsView: View {
         return adjustedMinDate...adjustedMaxDate
     }
     
-//    /// Chart Popover View
-//    @ViewBuilder
-//    func ChartPopOverView(_ downloads: Double, _ month: String, _ isTitleView: Bool = false, _ isSelection: Bool = false) -> some View {
-//        VStack(alignment: .leading, spacing: 6) {
-//            Text("\(isTitleView && !isSelection ? "Highest" : "App") Downloads")
-//                .font(.title3)
-//                .foregroundStyle(.gray)
-//            
-//            HStack(spacing: 4) {
-//                Text(String(format: "%.0f", downloads))
-//                    .font(.title3)
-//                    .fontWeight(.semibold)
-//                
-//                Text(month)
-//                    .font(.title3)
-//                    .textScale(.secondary)
-//            }
-//        }
-//        .padding(isTitleView ? [.horizontal] : [.all] )
-//        .background(Color("PopupColor").opacity(isTitleView ? 0 : 1), in: .rect(cornerRadius: 8))
-//        .frame(maxWidth: .infinity, alignment: isTitleView ? .leading : .center)
-//    }
-//    
-//    func findIssue(_ rangeValue: Double) {
-//        /// Converting Download Model into Array of Tuples
-//        var initalValue: Double = 0.0
-//        let convertedArray = viewModel.issueCounts
-//            .compactMap { issue -> (String, Range<Double>) in
-//                let rangeEnd = initalValue + issue.count
-//            let tuple = ("\(issue.weekStart)", initalValue..<rangeEnd)
-//            /// Updating Initial Value for next Iteration
-//            initalValue = rangeEnd
-//            return tuple
-//        }
-//        
-//        /// Now Finding the Value lies in the Range
-//        if let issue = convertedArray.first(where: {
-//            $0.1.contains(rangeValue)
-//        }) {
-//            /// Updating Selection
-//            selectedPoint = issue.0
-//        }
-//    }
+    //    /// Chart Popover View
+    //    @ViewBuilder
+    //    func ChartPopOverView(_ downloads: Double, _ month: String, _ isTitleView: Bool = false, _ isSelection: Bool = false) -> some View {
+    //        VStack(alignment: .leading, spacing: 6) {
+    //            Text("\(isTitleView && !isSelection ? "Highest" : "App") Downloads")
+    //                .font(.title3)
+    //                .foregroundStyle(.gray)
+    //
+    //            HStack(spacing: 4) {
+    //                Text(String(format: "%.0f", downloads))
+    //                    .font(.title3)
+    //                    .fontWeight(.semibold)
+    //
+    //                Text(month)
+    //                    .font(.title3)
+    //                    .textScale(.secondary)
+    //            }
+    //        }
+    //        .padding(isTitleView ? [.horizontal] : [.all] )
+    //        .background(Color("PopupColor").opacity(isTitleView ? 0 : 1), in: .rect(cornerRadius: 8))
+    //        .frame(maxWidth: .infinity, alignment: isTitleView ? .leading : .center)
+    //    }
+    //
+    //    func findIssue(_ rangeValue: Double) {
+    //        /// Converting Download Model into Array of Tuples
+    //        var initalValue: Double = 0.0
+    //        let convertedArray = viewModel.issueCounts
+    //            .compactMap { issue -> (String, Range<Double>) in
+    //                let rangeEnd = initalValue + issue.count
+    //            let tuple = ("\(issue.weekStart)", initalValue..<rangeEnd)
+    //            /// Updating Initial Value for next Iteration
+    //            initalValue = rangeEnd
+    //            return tuple
+    //        }
+    //        
+    //        /// Now Finding the Value lies in the Range
+    //        if let issue = convertedArray.first(where: {
+    //            $0.1.contains(rangeValue)
+    //        }) {
+    //            /// Updating Selection
+    //            selectedPoint = issue.0
+    //        }
+    //    }
 }
 
 #Preview {
