@@ -12,10 +12,11 @@ struct RepositoryDetailsView: View {
     let repository: Repository
     @StateObject private var viewModel = RepositoryDetailViewModel(githubService: GithubServiceIssues(networkProvider: NetworkingService(baseURL: URL(string: "https://api.github.com")!)))
     
-    @State private var selectedPoint: String?
-    @State private var scale: CGFloat = 1.0
+    @State private var selectedDataPoint: IssueCount? = nil
+    @State private var yScale: CGFloat = 1.0
     @State private var dateScale: CGFloat = 1.0
     @State private var offset: CGFloat = 0.0
+    @State private var showDataPointInfo = false
     
     var body: some View {
         VStack {
@@ -37,47 +38,101 @@ struct RepositoryDetailsView: View {
                     }
             } else {
                 Chart(viewModel.issueCounts) { issueCount in
-                    LineMark(
-                        x: .value("Week", issueCount.weekStart),
-                        y: .value("Issues", issueCount.count)
-                    )
-                    .foregroundStyle(.cyan)
-                    .foregroundStyle(.pink.opacity(0.7))
-                    .interpolationMethod(.catmullRom)
-                    .lineStyle(.init(lineWidth: 2))
-                    .symbol {
-                        Circle()
-                            .fill(.cyan)
-                            .frame(width: 12, height: 12)
-                    }
+                    createLineMark(for: issueCount)
+                    // Adding PointMark for tap detection
+                    createPointMark(for: issueCount)
+                    
                 }
                 .chartYAxisLabel("Number of Issues")
                 .chartXAxisLabel("Weeks")
                 .frame(height: 300)
                 .padding()
-                .chartYScale(domain: 0...(viewModel.issueCounts.map { $0.count }.max() ?? 1) * scale) // Scale Y-axis
+                .chartYScale(domain: 0...(viewModel.issueCounts.map { $0.count }.max() ?? 1) * yScale) // Scale Y-axis
                 .chartXScale(domain: computeXDomain())
                 .gesture(
                     MagnificationGesture()
                         .onChanged { value in
-                            scale = value.magnitude
+                            yScale = value.magnitude
                         }
                 )
-                .gesture(
-                    DragGesture()
-                        .onChanged { value in
-                            offset = value.translation.width
-                        }
-                        .onEnded { _ in
-                            dateScale += offset / 1000 // Adjust factor as needed for smooth scaling
-                            offset = 0
-                        }
-                )
+//                .gesture(
+//                    DragGesture()
+//                        .onChanged { value in
+//                            offset = value.translation.width
+//                        }
+//                        .onEnded { _ in
+//                            dateScale += offset / 1000 // Adjust factor as needed for smooth scaling
+//                            offset = 0
+//                        }
+//                )
             }
         }
         .navigationTitle(repository.name)
         .alert(isPresented: .constant(viewModel.errorMessage != nil)) {
             Alert(title: Text("Error"), message: Text(viewModel.errorMessage ?? ""), dismissButton: .default(Text("OK")))
+        }
+        .overlay(
+            // Overlay to display additional information
+            Group {
+                if showDataPointInfo, let dataPoint = selectedDataPoint {
+                    dataPointOverlay(for: dataPoint)
+                }
+            }
+                .animation(.easeInOut, value: showDataPointInfo)
+        )
+    }
+    
+    // Function to create the line mark
+    private func createLineMark(for issueCount: IssueCount) -> some ChartContent {
+        LineMark(
+            x: .value("Date", issueCount.weekStart),
+            y: .value("Issues", issueCount.count)
+        )
+        .interpolationMethod(.catmullRom)
+        .foregroundStyle(.blue)
+        .lineStyle(.init(lineWidth: 2))
+        .symbol {
+            Circle()
+                .fill(.cyan)
+                .frame(width: 12, height: 12)
+        }
+    }
+    
+    // Function to create the point mark with tap gesture
+    private func createPointMark(for issueCount: IssueCount) -> some ChartContent {
+        PointMark(
+            x: .value("Date", issueCount.weekStart),
+            y: .value("Issues", issueCount.count)
+        )
+        .foregroundStyle(.red) // Make it invisible
+        .annotation(position: .overlay) {
+            Rectangle()
+                .foregroundStyle(.yellow) // Make the rectangle clear
+                .frame(width: 20, height: 20)
+//                .contentShape(Rectangle()) // Define the tappable area
+                .onTapGesture {
+                    selectedDataPoint = issueCount
+                    showDataPointInfo = true
+                }
+        }
+    }
+    
+    // Overlay view to display data point information
+    @ViewBuilder
+    private func dataPointOverlay(for dataPoint: IssueCount) -> some View {
+        VStack {
+            Text("Details for Selected Data Point")
+                .font(.headline)
+                .padding(.bottom, 2)
+            Text("Date: \(dataPoint.weekStart.formatted(date: .abbreviated, time: .omitted))")
+            Text("Issues: \(dataPoint.count)")
+        }
+        .padding()
+        .background(Color.gray.opacity(0.9))
+        .cornerRadius(10)
+        .shadow(radius: 5)
+        .onTapGesture {
+            showDataPointInfo = false // Dismiss overlay on tap
         }
     }
     
