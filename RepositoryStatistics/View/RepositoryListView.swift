@@ -16,9 +16,21 @@ struct RepositoryListView: View {
     
     var body: some View {
         NavigationView {
-            List(viewModel.repositories) { repo in
-                NavigationLink(destination: RepositoryDetailsView(repository: repo)) {
-                    RepositoryRowView(repository: repo)
+            Group {
+                if viewModel.repositories.isEmpty {
+                    VStack {
+                        Text("No repositories available")
+                            .font(.title2)
+                            .foregroundColor(.gray)
+                            .padding()
+                        Spacer()
+                    }
+                } else {
+                    List(viewModel.repositories) { repo in
+                        NavigationLink(destination: RepositoryDetailsView(repository: repo)) {
+                            RepositoryRowView(repository: repo)
+                        }
+                    }
                 }
             }
             .navigationTitle("GitHub Repositories")
