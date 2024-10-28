@@ -9,10 +9,13 @@ import XCTest
 @testable import RepositoryStatistics
 
 final class NetworkingServiceTests: XCTestCase {
+    // MARK: - Properties
     
     var baseURL: URL!
     var mockSession: MockURLSession!
     var networkingService: NetworkingService<MockEndpoint>!
+    
+    // MARK: - Setup
     
     override func setUp() {
         super.setUp()
@@ -28,7 +31,8 @@ final class NetworkingServiceTests: XCTestCase {
         super.tearDown()
     }
     
-    // Test for successful response and decoding
+    // MARK: - Tests
+    
     func testRequest_SuccessfulResponse() async throws {
         // Given
         let expectedData = try JSONEncoder().encode(["key": "value"])
@@ -43,12 +47,10 @@ final class NetworkingServiceTests: XCTestCase {
         XCTAssertEqual(response["key"], "value")
     }
     
-    // Test for invalid response status code
+    
     func testRequest_InvalidResponseStatusCode() async {
-        // Given
         mockSession.responseToReturn = HTTPURLResponse(url: baseURL, statusCode: 500, httpVersion: nil, headerFields: nil)
         
-        // Then
         do {
             _ = try await networkingService.request(MockEndpoint(path: "test", httpMethod: .get), for: [String: String].self)
             XCTFail("Expected NetworkError.invalidResponse, but no error was thrown")
@@ -64,12 +66,9 @@ final class NetworkingServiceTests: XCTestCase {
         }
     }
     
-    // Test for no data response
     func testRequest_NoData() async {
-        // Given
         mockSession.dataToReturn = Data()  // empty data
         
-        // Then
         do {
             _ = try await networkingService.request(MockEndpoint(path: "test", httpMethod: .get), for: [String: String].self)
             XCTFail("Expected NetworkError.noData, but no error was thrown")
@@ -85,14 +84,11 @@ final class NetworkingServiceTests: XCTestCase {
         }
     }
     
-    // Test for decoding failure
     func testRequest_DecodingError() async {
-        // Given
         let invalidData = "invalid data".data(using: .utf8)!
         mockSession.dataToReturn = invalidData
         mockSession.responseToReturn = HTTPURLResponse(url: baseURL, statusCode: 200, httpVersion: nil, headerFields: nil)
         
-        // Then
         do {
             _ = try await networkingService.request(MockEndpoint(path: "test", httpMethod: .get), for: [String: String].self)
             XCTFail("Expected NetworkError.decodingError, but no error was thrown")

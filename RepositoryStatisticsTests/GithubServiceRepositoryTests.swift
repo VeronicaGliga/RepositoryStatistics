@@ -9,6 +9,8 @@ import XCTest
 @testable import RepositoryStatistics
 
 final class GithubServiceRepositoryTests: XCTestCase {
+    // MARK: - Properties
+    
     var mockURLSession: MockURLSession!
     var mockNetworkingService: MockNetworkingService<ApiTarget>!
     var githubServiceRepository: GithubServiceRepository!
@@ -30,6 +32,8 @@ final class GithubServiceRepositoryTests: XCTestCase {
             ]
             """.data(using: .utf8)!
     
+    // MARK: - Setup
+    
     override func setUp() {
         super.setUp()
         
@@ -37,6 +41,15 @@ final class GithubServiceRepositoryTests: XCTestCase {
         mockNetworkingService = MockNetworkingService(baseURL: URL(string: "https://example.com")!, session: mockURLSession)
         githubServiceRepository = GithubServiceRepository(networkProvider: mockNetworkingService)
     }
+    
+    override func tearDown() {
+        mockURLSession = nil
+        mockNetworkingService = nil
+        githubServiceRepository = nil
+        super.tearDown()
+    }
+    
+    // MARK: - Tests
     
     func testFetchPublicRepositories_success() async throws {
         // Given: a mocked response with valid repository JSON data
@@ -84,6 +97,8 @@ final class GithubServiceRepositoryTests: XCTestCase {
             XCTFail("Unexpected error type: \(error)")
         }
     }
+    
+    // MARK: - Helpers
     
     // Helper method to compare two repositories
     private func repositoriesAreEqual(_ lhs: Repository, _ rhs: Repository) -> Bool {
