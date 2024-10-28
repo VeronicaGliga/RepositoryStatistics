@@ -17,4 +17,10 @@ struct Issue: Identifiable, Codable {
         case createdAt = "created_at"
         case state
     }
+    
+    func dateFromString() -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        return formatter.date(from: createdAt)
+    }
 }

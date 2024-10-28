@@ -9,22 +9,22 @@ import SwiftUI
 import Charts
 
 struct RepositoryDetailsView: View {
+    // MARK: - Properties
+    
     let repository: Repository
     @StateObject private var viewModel = RepositoryDetailViewModel(githubService: GithubServiceIssues(networkProvider: NetworkingService(baseURL: URL(string: "https://api.github.com")!)))
     
     @State private var selectedDataPoint: GroupedIssue? = nil
-    @State private var yScale: CGFloat = 1.0
-    @State private var dateScale: CGFloat = 1.0
-    @State private var offset: CGFloat = 0.0
-    @State private var showDataPointInfo = false
+    @State private var dateScale: CGFloat = 1.0  // X-axis scale factor
     
     @State private var showSelectionBar = false
     @State private var offsetX = 0.0
     @State private var offsetY = 0.0
     
+    // MARK: - Body
+    
     var body: some View {
         VStack {
-            // Display key repository statistics
             VStack(alignment: .leading, spacing: 10) {
                 Text("⭐️ Stars: \(viewModel.stargazers.count)")
                 Text("🍴 Forks: \(viewModel.forks.count)")
@@ -32,7 +32,6 @@ struct RepositoryDetailsView: View {
             }
             .padding()
             
-            // Chart for issue history
             if viewModel.openIssues.isEmpty {
                 Text("No issues to show")
                     .font(.headline)
@@ -55,8 +54,15 @@ struct RepositoryDetailsView: View {
                 }
                 .frame(height: 300)
                 .padding()
-                .chartYScale(domain: 0...(viewModel.openIssues.map { Double($0.count) }.max() ?? 1) * yScale) // Scale Y-axis
-                .chartXScale(domain: computeXDomain())
+                .chartYScale(domain: 0...(viewModel.openIssues.map { Double($0.count) }.max() ?? 1)) // Scale Y-axis
+                .chartXScale(domain: computeXDomain()) // Scale X-axis dynamically
+                .chartXAxis {
+                    AxisMarks(preset: .aligned) { _ in
+                        AxisValueLabel(format: dateFormatter(), centered: true)  // Apply dynamic date formatter
+                        AxisTick()
+                        AxisGridLine()
+                    }
+                }
                 .chartOverlay { proxy in
                     GeometryReader { geometry in
                         Rectangle()
@@ -117,7 +123,7 @@ struct RepositoryDetailsView: View {
                 .gesture(
                     MagnificationGesture()
                         .onChanged { value in
-                            yScale = value.magnitude
+                            dateScale = value.magnitude - 0.3
                         }
                 )
             }
@@ -135,20 +141,7 @@ struct RepositoryDetailsView: View {
         }
     }
     
-    func findIssue(on date: Date) -> GroupedIssue? {
-        // Set up the date formatter to ignore the time component
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        
-        // Format the target date
-        let formattedTargetDate = dateFormatter.string(from: date)
-        
-        // Search for an issue with a matching formatted date
-        return viewModel.openIssues.first { issue in
-            let formattedWeekStart = dateFormatter.string(from: issue.weekStart)
-            return formattedWeekStart == formattedTargetDate
-        }
-    }
+    // MARK: - Functions
     
     // Compute dynamic X-axis domain based on dateScale
     private func computeXDomain() -> ClosedRange<Date> {
@@ -163,8 +156,20 @@ struct RepositoryDetailsView: View {
         
         return adjustedMinDate...adjustedMaxDate
     }
+    
+    // Dynamic date formatter based on dateScale
+    private func dateFormatter() -> Date.FormatStyle {
+        if dateScale > 2 {
+            return .dateTime.month().day()
+        } else if dateScale > 1.5 {
+            return .dateTime.month()
+        } else {
+            return .dateTime.year()
+        }
+    }
 }
 
 #Preview {
     RepositoryDetailsView(repository: Repository(id: 1, name: "Test Name", owner: Owner(id: 1, name: "Test Name"), description: "Test Description", url: ""))
 }
+

@@ -8,19 +8,21 @@
 import SwiftUI
 
 struct RepositoryListView: View {
+    // MARK: - Properties
     
     @StateObject private var viewModel = RepositoryListViewModel(githubService: GithubServiceRepository(networkProvider: NetworkingService(baseURL: URL(string: "https://api.github.com")!)))
+    
+    // MARK: - Body
     
     var body: some View {
         NavigationView {
             List(viewModel.repositories) { repo in
                 NavigationLink(destination: RepositoryDetailsView(repository: repo)) {
-                    RepositoryRowView(repository: repo) // Custom row view for each repo
+                    RepositoryRowView(repository: repo)
                 }
             }
             .navigationTitle("GitHub Repositories")
             .task {
-                // Call the async function to load repositories
                 await viewModel.fetchRepositories()
             }
             .alert(isPresented: .constant(viewModel.errorMessage != nil)) {
@@ -31,6 +33,8 @@ struct RepositoryListView: View {
         }
     }
 }
+
+// MARK: - RepositoryRowView
 
 struct RepositoryRowView: View {
     let repository: Repository
