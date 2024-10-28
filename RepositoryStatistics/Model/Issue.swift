@@ -10,9 +10,13 @@ import Foundation
 struct Issue: Identifiable, Codable {
     let id: Int
     let createdAt: String
+    let state: String
     
     enum CodingKeys: String, CodingKey {
         case id
         case createdAt = "created_at"
+        case state
     }
+    
+    
 }

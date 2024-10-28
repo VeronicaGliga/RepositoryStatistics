@@ -12,7 +12,7 @@ struct RepositoryDetailsView: View {
     let repository: Repository
     @StateObject private var viewModel = RepositoryDetailViewModel(githubService: GithubServiceIssues(networkProvider: NetworkingService(baseURL: URL(string: "https://api.github.com")!)))
     
-    @State private var selectedDataPoint: IssueCount? = nil
+    @State private var selectedDataPoint: GroupedIssue? = nil
     @State private var yScale: CGFloat = 1.0
     @State private var dateScale: CGFloat = 1.0
     @State private var offset: CGFloat = 0.0
@@ -33,7 +33,7 @@ struct RepositoryDetailsView: View {
             .padding()
             
             // Chart for issue history
-            if viewModel.issueCounts.isEmpty {
+            if viewModel.openIssues.isEmpty {
                 Text("Loading issue data...")
                     .onAppear {
                         Task {
@@ -41,13 +41,12 @@ struct RepositoryDetailsView: View {
                         }
                     }
             } else {
-                Chart(viewModel.issueCounts) { issueCount in
+                Chart(viewModel.openIssues) { issueCount in
                     LineMark(
                         x: .value("Week", issueCount.weekStart),
                         y: .value("Issues", issueCount.count)
                     )
                     .foregroundStyle(.cyan)
-                    .foregroundStyle(.pink.opacity(0.7))
                     .interpolationMethod(.catmullRom)
                     .lineStyle(.init(lineWidth: 2))
                     .symbol {
@@ -56,11 +55,9 @@ struct RepositoryDetailsView: View {
                             .frame(width: 12, height: 12)
                     }
                 }
-                .chartYAxisLabel("Number of Issues")
-                .chartXAxisLabel("Weeks")
                 .frame(height: 300)
                 .padding()
-                .chartYScale(domain: 0...(viewModel.issueCounts.map { Double($0.count) }.max() ?? 1) * yScale) // Scale Y-axis
+                .chartYScale(domain: 0...(viewModel.openIssues.map { Double($0.count) }.max() ?? 1) * yScale) // Scale Y-axis
                 .chartXScale(domain: computeXDomain())
                 .chartOverlay { proxy in
                     GeometryReader { geometry in
@@ -102,7 +99,7 @@ struct RepositoryDetailsView: View {
                                         // Convert the location to an X-axis date
                                         if let date: Date = proxy.value(atX: location.x) {
                                             // Find the nearest data point by date
-                                            if let nearestPoint = viewModel.issueCounts.min(by: { abs($0.weekStart.timeIntervalSince(date)) < abs($1.weekStart.timeIntervalSince(date)) }) {
+                                            if let nearestPoint = viewModel.openIssues.min(by: { abs($0.weekStart.timeIntervalSince(date)) < abs($1.weekStart.timeIntervalSince(date)) }) {
                                                 selectedDataPoint = nearestPoint
                                                 
                                                 if let position = proxy.position(for: (nearestPoint.weekStart, nearestPoint.count)),
@@ -151,7 +148,7 @@ struct RepositoryDetailsView: View {
         }
     }
     
-    func findIssue(on date: Date) -> IssueCount? {
+    func findIssue(on date: Date) -> GroupedIssue? {
         // Set up the date formatter to ignore the time component
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
@@ -160,7 +157,7 @@ struct RepositoryDetailsView: View {
         let formattedTargetDate = dateFormatter.string(from: date)
         
         // Search for an issue with a matching formatted date
-        return viewModel.issueCounts.first { issue in
+        return viewModel.openIssues.first { issue in
             let formattedWeekStart = dateFormatter.string(from: issue.weekStart)
             return formattedWeekStart == formattedTargetDate
         }
@@ -168,8 +165,8 @@ struct RepositoryDetailsView: View {
     
     // Compute dynamic X-axis domain based on dateScale
     private func computeXDomain() -> ClosedRange<Date> {
-        guard let minDate = viewModel.issueCounts.map({ $0.weekStart }).min(),
-              let maxDate = viewModel.issueCounts.map({ $0.weekStart }).max() else {
+        guard let minDate = viewModel.openIssues.map({ $0.weekStart }).min(),
+              let maxDate = viewModel.openIssues.map({ $0.weekStart }).max() else {
             return Date()...Date()
         }
         

@@ -27,8 +27,9 @@
 		D2553C812CC90BE30070C089 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2553C802CC90BE30070C089 /* NetworkError.swift */; };
 		D2553C862CC918210070C089 /* GithubServiceRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2553C852CC918210070C089 /* GithubServiceRepository.swift */; };
 		D2553C882CC918400070C089 /* GithubServiceIssues.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2553C872CC918400070C089 /* GithubServiceIssues.swift */; };
-		D2553C8B2CC919FE0070C089 /* IssueCount.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2553C8A2CC919FE0070C089 /* IssueCount.swift */; };
+		D2553C8B2CC919FE0070C089 /* GroupedIssue.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2553C8A2CC919FE0070C089 /* GroupedIssue.swift */; };
 		D2553C8D2CC91B3F0070C089 /* HTTPMethod.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2553C8C2CC91B3F0070C089 /* HTTPMethod.swift */; };
+		D28B3FB62CCF23F4007BFD73 /* IssueState.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28B3FB52CCF23F4007BFD73 /* IssueState.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -73,8 +74,9 @@
 		D2553C802CC90BE30070C089 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 		D2553C852CC918210070C089 /* GithubServiceRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubServiceRepository.swift; sourceTree = "<group>"; };
 		D2553C872CC918400070C089 /* GithubServiceIssues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubServiceIssues.swift; sourceTree = "<group>"; };
-		D2553C8A2CC919FE0070C089 /* IssueCount.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IssueCount.swift; sourceTree = "<group>"; };
+		D2553C8A2CC919FE0070C089 /* GroupedIssue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GroupedIssue.swift; sourceTree = "<group>"; };
 		D2553C8C2CC91B3F0070C089 /* HTTPMethod.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPMethod.swift; sourceTree = "<group>"; };
+		D28B3FB52CCF23F4007BFD73 /* IssueState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IssueState.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -165,6 +167,7 @@
 		D2553C562CC7C1780070C089 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				D2553C8A2CC919FE0070C089 /* GroupedIssue.swift */,
 				D2553C502CC7BE610070C089 /* Issue.swift */,
 				D2553C542CC7C0860070C089 /* Owner.swift */,
 				D23B99C62CC7B49C00F85A86 /* Repository.swift */,
@@ -214,8 +217,8 @@
 			isa = PBXGroup;
 			children = (
 				D2553C8C2CC91B3F0070C089 /* HTTPMethod.swift */,
-				D2553C8A2CC919FE0070C089 /* IssueCount.swift */,
 				D2553C802CC90BE30070C089 /* NetworkError.swift */,
+				D28B3FB52CCF23F4007BFD73 /* IssueState.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -361,7 +364,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D23B99CB2CC7B55B00F85A86 /* RepositoryListView.swift in Sources */,
-				D2553C8B2CC919FE0070C089 /* IssueCount.swift in Sources */,
+				D2553C8B2CC919FE0070C089 /* GroupedIssue.swift in Sources */,
 				D2553C512CC7BE620070C089 /* Issue.swift in Sources */,
 				D2553C5C2CC7C8AC0070C089 /* RepositoryDetailsView.swift in Sources */,
 				D2553C532CC7BF0F0070C089 /* RepositoryDetailsViewModel.swift in Sources */,
@@ -369,6 +372,7 @@
 				D2553C882CC918400070C089 /* GithubServiceIssues.swift in Sources */,
 				D2553C552CC7C0860070C089 /* Owner.swift in Sources */,
 				D2553C7B2CC901140070C089 /* NetworkingService.swift in Sources */,
+				D28B3FB62CCF23F4007BFD73 /* IssueState.swift in Sources */,
 				D23B999A2CC7B39300F85A86 /* RepositoryStatisticsApp.swift in Sources */,
 				D23B99C52CC7B3CF00F85A86 /* GithubService.swift in Sources */,
 				D23B99C72CC7B49C00F85A86 /* Repository.swift in Sources */,

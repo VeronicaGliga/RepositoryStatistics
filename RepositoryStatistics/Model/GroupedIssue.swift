@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct IssueCount: Identifiable {
+struct GroupedIssue: Identifiable {
     var id = UUID()
     let weekStart: Date
     let count: Int

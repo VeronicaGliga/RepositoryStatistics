@@ -13,7 +13,8 @@ class RepositoryDetailViewModel: ObservableObject {
     
     private let githubService: GithubServiceIssues
     
-    @Published var issueCounts = [IssueCount]()
+    @Published var openIssues = [GroupedIssue]()
+    @Published var closedIssues = [GroupedIssue]()
     @Published var issues = [Issue]()
     @Published var errorMessage: String?
     
@@ -31,30 +32,44 @@ class RepositoryDetailViewModel: ObservableObject {
             issues = try await githubService.fetchIssues(for: repository.name, owner: repository.owner.name)
             
             // Process and group issues by week
-            issueCounts = groupIssuesByWeek(issues)
+            splitAndGroupIssuesByWeek(issues: issues)
         } catch {
             errorMessage = "Failed to load issues"
         }
     }
     
-    // Group issues by week
-    private func groupIssuesByWeek(_ issues: [Issue]) -> [IssueCount] {
+    func dateFromString(_ dateString: String) -> Date? {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
+        return formatter.date(from: dateString)
+    }
+    
+    func splitAndGroupIssuesByWeek(issues: [Issue]) {
         let calendar = Calendar.current
-        let dateFormatter = ISO8601DateFormatter()
-        var groupedIssues = [Date: [Issue]]()
         
-        for issue in issues {
-            if let createdAt = dateFormatter.date(from: issue.createdAt) {
-                let weekStart = calendar.dateInterval(of: .weekOfYear, for: createdAt)!.start
-                groupedIssues[weekStart, default: []].append(issue)
+        // Split issues into open and closed
+        let open = issues.filter { $0.state == "open" }
+        let closed = issues.filter { $0.state == "closed" }
+        
+        // Helper to group issues by week number
+        func groupByWeek(issues: [Issue]) -> [GroupedIssue] {
+            var groupedIssues = [Date: Int]()
+            
+            for issue in issues {
+                if let date = dateFromString(issue.createdAt) {
+                    if let weekStart = calendar.dateInterval(of: .weekOfYear, for: date)?.start {
+                        groupedIssues[weekStart, default: 0] += 1
+                    }
+                }
             }
+            
+            return groupedIssues.map { weekStart, count in
+                GroupedIssue(weekStart: weekStart, count: count)
+            }.sorted { $0.weekStart < $1.weekStart }
         }
         
-        // Convert the dictionary into an array of IssueCount
-        let issueCounts = groupedIssues.map { (weekStart, issues) in
-            IssueCount(weekStart: weekStart, count: issues.count)
-        }
-        
-        return issueCounts.sorted { $0.weekStart < $1.weekStart }
+        // Group each set of issues by week
+        openIssues = groupByWeek(issues: open)
+        closedIssues = groupByWeek(issues: closed)
     }
 }
