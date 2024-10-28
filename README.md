@@ -26,3 +26,17 @@
 * **Swift**: For the main programming language
 * **SwfftUI**: To build the UI and manage state.
 * **Charts Framework**: Apple framework for displaying charts.
+
+## Further Improvements
+
+**Features**
+    * **Make the Chart Scrollable**: Allow users to scroll horizontally through the chart to explore extended data over time without crowding the display.
+    * **Date Range Selection**: Add possibility for users to select predefined date ranges or use a date-picker feature to enable users to select a specific date range for visualizing issue history.
+    * **Detailed Issue Information**: Extend the chart data and statistics section to include more issue details, such as:
+            * Breakdown of open, closed, and in-progress issues.
+            * Highlights of significant spikes in issues.
+            * Information on the top contributors addressing issues or key contributors for the selected time period.
+
+**Technical**
+    * **Dependency Injector for Dependency Management**: Integrate a dependency injection framework (e.g., Swinject) to better manage dependencies.
+    * **Use Coordinators for Navigation Management**: Adopt the Coordinator pattern to handle navigation flow across the app
