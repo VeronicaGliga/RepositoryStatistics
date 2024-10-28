@@ -41,3 +41,7 @@
 **Technical**
     * **Dependency Injector for Dependency Management**: Integrate a dependency injection framework (e.g., Swinject) to better manage dependencies.
     * **Use Coordinators for Navigation Management**: Adopt the Coordinator pattern to handle navigation flow across the app
+
+## Limitations
+
+The primary rate limit for unauthenticated requests on Github API is 60 requests per hour.
