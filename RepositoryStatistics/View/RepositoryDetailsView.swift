@@ -62,51 +62,40 @@ struct RepositoryDetailsView: View {
                 .padding()
                 .chartYScale(domain: 0...(viewModel.issueCounts.map { Double($0.count) }.max() ?? 1) * yScale) // Scale Y-axis
                 .chartXScale(domain: computeXDomain())
-                .chartOverlay { pr in
-                    GeometryReader { geoProxy in
-                        Rectangle().foregroundStyle(Color.orange.gradient)
-                            .frame(width: 2, height: geoProxy.size.height * 0.95)
+                .chartOverlay { proxy in
+                    GeometryReader { geometry in
+                        Rectangle()
+                            .foregroundStyle(Color.orange.gradient)
+                            .frame(width: 2, height: geometry.size.height * 0.95)
                             .opacity(showSelectionBar ? 1.0 : 0.0)
                             .offset(x: offsetX)
                         
-                        Capsule()
-                            .foregroundStyle(.orange.gradient)
-                            .frame(width: 100, height: 50)
-                            .overlay {
-                                VStack {
-                                    if let selectedDataPoint {
-                                        Text(selectedDataPoint.formattedWeekStart)
-                                        Text("\(selectedDataPoint.count) issues")
+                        Rectangle()
+                            .fill(Color.clear)
+                            .contentShape(Rectangle())
+                            .gesture(
+                                DragGesture()
+                                    .onChanged { value in
+                                        showSelectionBar = true
+                                        let location = value.location
+                                        
+                                        // Convert the location to an X-axis date
+                                        if let date: Date = proxy.value(atX: location.x) {
+                                            // Find the nearest data point by date
+                                            if let nearestPoint = viewModel.issueCounts.min(by: { abs($0.weekStart.timeIntervalSince(date)) < abs($1.weekStart.timeIntervalSince(date)) }) {
+                                                selectedDataPoint = nearestPoint
+                                                
+                                                if let position = proxy.position(for: (nearestPoint.weekStart, nearestPoint.count)),
+                                                let plotFrame = proxy.plotFrame {
+                                                    offsetX = geometry[plotFrame].origin.x + position.x
+                                                }
+                                            }
+                                        }
                                     }
-                                }
-                                .foregroundStyle(.white.gradient)
-                            }
-                            .opacity(showSelectionBar ? 1.0 : 0.0)
-                            .offset(x: offsetX - 50, y: offsetY - 50)
-                        
-                        Rectangle().fill(.clear).contentShape(Rectangle())
-                            .gesture(DragGesture().onChanged { value in
-                                if !showSelectionBar {
-                                    showSelectionBar = true
-                                }
-                                let origin = geoProxy[pr.plotAreaFrame].origin
-                                let location = CGPoint(
-                                    x: value.location.x - origin.x,
-                                    y: value.location.y - origin.y
-                                )
-                                offsetX = location.x
-                                offsetY = location.y
-                                
-                                let (date, _) = pr.value(at: location, as: (Date, Int).self) ?? (Date(), 0)
-                                if let issue = findIssue(on: date) {
-                                    selectedDataPoint = issue
-                                }
-                                
-                                print(selectedDataPoint)
-                            }
-                                .onEnded({ _ in
-                                    showSelectionBar = false
-                                }))
+                                    .onEnded { _ in
+                                        showSelectionBar = false
+                                    }
+                            )
                     }
                 }
                 .gesture(
@@ -115,16 +104,24 @@ struct RepositoryDetailsView: View {
                             yScale = value.magnitude
                         }
                 )
-                //                .gesture(
-                //                    DragGesture()
-                //                        .onChanged { value in
-                //                            offset = value.translation.width
-                //                        }
-                //                        .onEnded { _ in
-                //                            dateScale += offset / 1000 // Adjust factor as needed for smooth scaling
-                //                            offset = 0
-                //                        }
-                //                )
+                .gesture(
+                    DragGesture()
+                        .onChanged { value in
+                            offset = value.translation.width
+                        }
+                        .onEnded { _ in
+                            dateScale += offset / 1000 // Adjust factor as needed for smooth scaling
+                            offset = 0
+                        }
+                )
+                
+                // Display selected data point information
+                if let selectedDataPoint = selectedDataPoint {
+                    Text("Selected Date: \(selectedDataPoint.weekStart, style: .date), Issues: \(selectedDataPoint.count)")
+                        .padding()
+                        .background(Color.white.opacity(0.8))
+                        .cornerRadius(5)
+                }
             }
         }
         .navigationTitle(repository.name)
@@ -196,7 +193,7 @@ struct RepositoryDetailsView: View {
     //            initalValue = rangeEnd
     //            return tuple
     //        }
-    //        
+    //
     //        /// Now Finding the Value lies in the Range
     //        if let issue = convertedArray.first(where: {
     //            $0.1.contains(rangeValue)
