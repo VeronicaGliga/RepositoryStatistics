@@ -12,8 +12,6 @@ struct Repository: Identifiable, Decodable {
     let name: String
     let owner: Owner
     let description: String?
-    let stargazersCount: Int?
-    let forksCount: Int?
     let url: String
     
     enum CodingKeys: String, CodingKey {
@@ -21,8 +19,6 @@ struct Repository: Identifiable, Decodable {
         case name
         case owner
         case description
-        case stargazersCount = "stargazers_count"
-        case forksCount = "forks_count"
         case url = "html_url"
     }
 }

@@ -11,11 +11,13 @@ class NetworkingService<T: Endpoint> {
     // MARK: - Properties
     
     let baseURL: URL
+    var session: URLSessionProtocol
     
     // MARK: - Init
     
-    init(baseURL: URL) {
+    init(baseURL: URL, session: URLSessionProtocol = URLSession.shared) {
         self.baseURL = baseURL
+        self.session = session
     }
     
     // MARK: - Function
@@ -29,7 +31,7 @@ class NetworkingService<T: Endpoint> {
         urlRequest.httpMethod = request.httpMethod.rawValue
         
         // Perform the network request asynchronously
-        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+        let (data, response) = try await session.data(for: urlRequest)
         
         // Check if the response is valid (status code 200-299)
         if let httpResponse = response as? HTTPURLResponse,
