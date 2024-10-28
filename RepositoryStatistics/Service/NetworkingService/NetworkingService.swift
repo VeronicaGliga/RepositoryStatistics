@@ -46,6 +46,7 @@ class NetworkingService<T: Endpoint> {
             let decodedData = try JSONDecoder().decode(U.self, from: data)
             return decodedData
         } catch {
+            print(error.localizedDescription)
             throw NetworkError.decodingError(error)
         }
     }

@@ -42,12 +42,6 @@ struct RepositoryRowView: View {
             Text(repository.description ?? "No description available")
                 .font(.subheadline)
                 .foregroundColor(.secondary)
-            HStack {
-                Text("⭐️ \(repository.stargazersCount ?? 0)")
-                Text("🍴 \(repository.forksCount ?? 0)")
-            }
-            .font(.footnote)
-            .foregroundColor(.secondary)
         }
     }
 }

@@ -17,6 +17,4 @@ struct Issue: Identifiable, Codable {
         case createdAt = "created_at"
         case state
     }
-    
-    
 }

@@ -17,6 +17,8 @@ class RepositoryDetailViewModel: ObservableObject {
     @Published var closedIssues = [GroupedIssue]()
     @Published var issues = [Issue]()
     @Published var errorMessage: String?
+    @Published var stargazers = [Stargazer]()
+    @Published var forks = [Fork]()
     
     // MARK: - Init
     
@@ -34,7 +36,23 @@ class RepositoryDetailViewModel: ObservableObject {
             // Process and group issues by week
             splitAndGroupIssuesByWeek(issues: issues)
         } catch {
-            errorMessage = "Failed to load issues"
+            errorMessage = error.localizedDescription
+        }
+    }
+    
+    func fetchStargazers(for repository: Repository) async {
+        do {
+            stargazers = try await githubService.fetchStargazers(for: repository.name, owner: repository.owner.name)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+    
+    func fetchForks(for repository: Repository) async {
+        do {
+            forks = try await githubService.fetchForks(for: repository.name, owner: repository.owner.name)
+        } catch {
+            errorMessage = error.localizedDescription
         }
     }
     

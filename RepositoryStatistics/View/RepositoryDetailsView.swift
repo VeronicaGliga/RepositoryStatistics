@@ -26,20 +26,18 @@ struct RepositoryDetailsView: View {
         VStack {
             // Display key repository statistics
             VStack(alignment: .leading, spacing: 10) {
-                Text("⭐️ Stars: \(repository.stargazersCount ?? 0)")
-                Text("🍴 Forks: \(repository.forksCount ?? 0)")
+                Text("⭐️ Stars: \(viewModel.stargazers.count)")
+                Text("🍴 Forks: \(viewModel.forks.count)")
                 Text("🐞 Open Issues: \(viewModel.issues.count)")
             }
             .padding()
             
             // Chart for issue history
             if viewModel.openIssues.isEmpty {
-                Text("Loading issue data...")
-                    .onAppear {
-                        Task {
-                            await viewModel.fetchRepositoryIssues(for: repository)
-                        }
-                    }
+                Text("No issues to show")
+                    .font(.headline)
+                    .foregroundColor(.gray)
+                    .padding()
             } else {
                 Chart(viewModel.openIssues) { issueCount in
                     LineMark(
@@ -122,29 +120,18 @@ struct RepositoryDetailsView: View {
                             yScale = value.magnitude
                         }
                 )
-                .gesture(
-                    DragGesture()
-                        .onChanged { value in
-                            offset = value.translation.width
-                        }
-                        .onEnded { _ in
-                            dateScale += offset / 1000 // Adjust factor as needed for smooth scaling
-                            offset = 0
-                        }
-                )
-                
-                // Display selected data point information
-                if let selectedDataPoint = selectedDataPoint {
-                    Text("Selected Date: \(selectedDataPoint.weekStart, style: .date), Issues: \(selectedDataPoint.count)")
-                        .padding()
-                        .background(Color.white.opacity(0.8))
-                        .cornerRadius(5)
-                }
             }
         }
         .navigationTitle(repository.name)
+        .task {
+            await viewModel.fetchRepositoryIssues(for: repository)
+            await viewModel.fetchStargazers(for: repository)
+            await viewModel.fetchForks(for: repository)
+        }
         .alert(isPresented: .constant(viewModel.errorMessage != nil)) {
-            Alert(title: Text("Error"), message: Text(viewModel.errorMessage ?? ""), dismissButton: .default(Text("OK")))
+            Alert(title: Text("Error"),
+                  message: Text(viewModel.errorMessage ?? ""),
+                  dismissButton: .default(Text("OK")))
         }
     }
     
@@ -176,50 +163,6 @@ struct RepositoryDetailsView: View {
         
         return adjustedMinDate...adjustedMaxDate
     }
-    
-    //    /// Chart Popover View
-    //    @ViewBuilder
-    //    func ChartPopOverView(_ downloads: Double, _ month: String, _ isTitleView: Bool = false, _ isSelection: Bool = false) -> some View {
-    //        VStack(alignment: .leading, spacing: 6) {
-    //            Text("\(isTitleView && !isSelection ? "Highest" : "App") Downloads")
-    //                .font(.title3)
-    //                .foregroundStyle(.gray)
-    //
-    //            HStack(spacing: 4) {
-    //                Text(String(format: "%.0f", downloads))
-    //                    .font(.title3)
-    //                    .fontWeight(.semibold)
-    //
-    //                Text(month)
-    //                    .font(.title3)
-    //                    .textScale(.secondary)
-    //            }
-    //        }
-    //        .padding(isTitleView ? [.horizontal] : [.all] )
-    //        .background(Color("PopupColor").opacity(isTitleView ? 0 : 1), in: .rect(cornerRadius: 8))
-    //        .frame(maxWidth: .infinity, alignment: isTitleView ? .leading : .center)
-    //    }
-    //
-    //    func findIssue(_ rangeValue: Double) {
-    //        /// Converting Download Model into Array of Tuples
-    //        var initalValue: Double = 0.0
-    //        let convertedArray = viewModel.issueCounts
-    //            .compactMap { issue -> (String, Range<Double>) in
-    //                let rangeEnd = initalValue + issue.count
-    //            let tuple = ("\(issue.weekStart)", initalValue..<rangeEnd)
-    //            /// Updating Initial Value for next Iteration
-    //            initalValue = rangeEnd
-    //            return tuple
-    //        }
-    //
-    //        /// Now Finding the Value lies in the Range
-    //        if let issue = convertedArray.first(where: {
-    //            $0.1.contains(rangeValue)
-    //        }) {
-    //            /// Updating Selection
-    //            selectedPoint = issue.0
-    //        }
-    //    }
 }
 
 #Preview {

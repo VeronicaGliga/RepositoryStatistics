@@ -15,4 +15,20 @@ class GithubServiceIssues: GithubService {
             throw error
         }
     }
+    
+    func fetchStargazers(for repository: String, owner: String) async throws -> [Stargazer] {
+        do {
+            return try await networkProvider.request(.getRepositoryStargazers(owner: owner, repository: repository), for: [Stargazer].self)
+        } catch {
+            throw error
+        }
+    }
+    
+    func fetchForks(for repository: String, owner: String) async throws -> [Fork] {
+        do {
+            return try await networkProvider.request(.getRepositoryStargazers(owner: owner, repository: repository), for: [Fork].self)
+        } catch {
+            throw error
+        }
+    }
 }
