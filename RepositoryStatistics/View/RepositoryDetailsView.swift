@@ -77,7 +77,7 @@ struct RepositoryDetailsView: View {
                                 .frame(width: 100, height: 50)
                                 .overlay {
                                     VStack {
-                                        Text(selectedDataPoint.formattedWeekStart)
+                                        Text(selectedDataPoint.weekStart.toString())
                                             .font(.caption)
                                             .minimumScaleFactor(0.5)
                                         Text("\(selectedDataPoint.count) issues")

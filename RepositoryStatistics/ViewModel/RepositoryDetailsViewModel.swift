@@ -56,13 +56,7 @@ class RepositoryDetailViewModel: ObservableObject {
         }
     }
     
-    func dateFromString(_ dateString: String) -> Date? {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
-        return formatter.date(from: dateString)
-    }
-    
-    func splitAndGroupIssuesByWeek(issues: [Issue]) {
+    private func splitAndGroupIssuesByWeek(issues: [Issue]) {
         let calendar = Calendar.current
         
         // Split issues into open and closed
@@ -74,7 +68,7 @@ class RepositoryDetailViewModel: ObservableObject {
             var groupedIssues = [Date: Int]()
             
             for issue in issues {
-                if let date = dateFromString(issue.createdAt) {
+                if let date = issue.createdAt.toDate() {
                     if let weekStart = calendar.dateInterval(of: .weekOfYear, for: date)?.start {
                         groupedIssues[weekStart, default: 0] += 1
                     }

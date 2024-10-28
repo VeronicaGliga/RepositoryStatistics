@@ -39,6 +39,8 @@
 		D28B3FCE2CCFCB2C007BFD73 /* NetworkingServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28B3FCD2CCFCB2C007BFD73 /* NetworkingServiceProtocol.swift */; };
 		D28B3FD12CCFD4F0007BFD73 /* MockURLSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28B3FD02CCFD4F0007BFD73 /* MockURLSession.swift */; };
 		D28B3FD32CCFD53A007BFD73 /* MockEndpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28B3FD22CCFD53A007BFD73 /* MockEndpoint.swift */; };
+		D2BBF1302CD00582008A33F2 /* String+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2BBF12F2CD00582008A33F2 /* String+Extensions.swift */; };
+		D2BBF1322CD00657008A33F2 /* Date+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2BBF1312CD00657008A33F2 /* Date+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -95,6 +97,8 @@
 		D28B3FCD2CCFCB2C007BFD73 /* NetworkingServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingServiceProtocol.swift; sourceTree = "<group>"; };
 		D28B3FD02CCFD4F0007BFD73 /* MockURLSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockURLSession.swift; sourceTree = "<group>"; };
 		D28B3FD22CCFD53A007BFD73 /* MockEndpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockEndpoint.swift; sourceTree = "<group>"; };
+		D2BBF12F2CD00582008A33F2 /* String+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extensions.swift"; sourceTree = "<group>"; };
+		D2BBF1312CD00657008A33F2 /* Date+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -242,6 +246,8 @@
 				D2553C8C2CC91B3F0070C089 /* HTTPMethod.swift */,
 				D28B3FB52CCF23F4007BFD73 /* IssueState.swift */,
 				D2553C802CC90BE30070C089 /* NetworkError.swift */,
+				D2BBF12F2CD00582008A33F2 /* String+Extensions.swift */,
+				D2BBF1312CD00657008A33F2 /* Date+Extensions.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -415,8 +421,10 @@
 				D23B99C52CC7B3CF00F85A86 /* GithubService.swift in Sources */,
 				D28B3FB82CCF9B56007BFD73 /* Stargazer.swift in Sources */,
 				D23B99C72CC7B49C00F85A86 /* Repository.swift in Sources */,
+				D2BBF1322CD00657008A33F2 /* Date+Extensions.swift in Sources */,
 				D2553C8D2CC91B3F0070C089 /* HTTPMethod.swift in Sources */,
 				D2553C812CC90BE30070C089 /* NetworkError.swift in Sources */,
+				D2BBF1302CD00582008A33F2 /* String+Extensions.swift in Sources */,
 				D2553C7F2CC909480070C089 /* Endpoint.swift in Sources */,
 				D2553C862CC918210070C089 /* GithubServiceRepository.swift in Sources */,
 				D23B99C92CC7B4E100F85A86 /* RepositoryListViewModel.swift in Sources */,

@@ -11,10 +11,4 @@ struct GroupedIssue: Identifiable {
     var id = UUID()
     let weekStart: Date
     let count: Int
-    
-    var formattedWeekStart: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "d MMM yyyy"
-        return formatter.string(from: weekStart)
-    }
 }

@@ -31,6 +31,7 @@
 
 **Features**
     * **Make the Chart Scrollable**: Allow users to scroll horizontally through the chart to explore extended data over time without crowding the display.
+    * **Improve Issue Gropping**:  
     * **Date Range Selection**: Add possibility for users to select predefined date ranges or use a date-picker feature to enable users to select a specific date range for visualizing issue history.
     * **Detailed Issue Information**: Extend the chart data and statistics section to include more issue details, such as:
             * Breakdown of open, closed, and in-progress issues.
