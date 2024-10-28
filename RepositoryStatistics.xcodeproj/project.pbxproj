@@ -188,12 +188,12 @@
 		D2553C562CC7C1780070C089 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				D28B3FB92CCF9B9A007BFD73 /* Fork.swift */,
 				D2553C8A2CC919FE0070C089 /* GroupedIssue.swift */,
 				D2553C502CC7BE610070C089 /* Issue.swift */,
 				D2553C542CC7C0860070C089 /* Owner.swift */,
 				D23B99C62CC7B49C00F85A86 /* Repository.swift */,
 				D28B3FB72CCF9B56007BFD73 /* Stargazer.swift */,
-				D28B3FB92CCF9B9A007BFD73 /* Fork.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -252,8 +252,8 @@
 				D2553C7C2CC901DE0070C089 /* ApiTarget.swift */,
 				D2553C7E2CC909480070C089 /* Endpoint.swift */,
 				D2553C7A2CC901140070C089 /* NetworkingService.swift */,
-				D28B3FC52CCFB0DA007BFD73 /* URLSessionProtocol.swift */,
 				D28B3FCD2CCFCB2C007BFD73 /* NetworkingServiceProtocol.swift */,
+				D28B3FC52CCFB0DA007BFD73 /* URLSessionProtocol.swift */,
 			);
 			path = NetworkingService;
 			sourceTree = "<group>";

@@ -13,7 +13,7 @@ protocol NetworkingServiceProtocol {
     /// Makes a network request to the given endpoint and returns a decoded response of the specified type.
     ///
     /// - Parameters:
-    ///   - endpoint: The endpoint to be requested, conforming to the `Endpoint` protocol.
+    ///   - request: The endpoint to be requested, conforming to the `Endpoint` protocol.
     ///   - type: The expected type of the response, which must conform to `Decodable`.
     /// - Returns: A decoded response of type `U` if the request and decoding are successful.
     /// - Throws: An error if the request fails or the response cannot be decoded.

@@ -23,14 +23,10 @@ class NetworkingService<T: Endpoint>: NetworkingServiceProtocol {
     // MARK: - Function
     
     func request<U: Decodable>(_ request: T, for type: U.Type) async throws -> U {
-        // Create the URL from baseURL and endpoint path
         let url = baseURL.appendingPathComponent(request.path)
-        
-        // Create the URLRequest object
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = request.httpMethod.rawValue
         
-        // Perform the network request asynchronously
         let (data, response) = try await session.data(for: urlRequest)
         
         // Check if the response is valid (status code 200-299)
