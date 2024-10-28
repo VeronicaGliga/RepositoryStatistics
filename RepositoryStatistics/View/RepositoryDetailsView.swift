@@ -70,6 +70,26 @@ struct RepositoryDetailsView: View {
                             .opacity(showSelectionBar ? 1.0 : 0.0)
                             .offset(x: offsetX)
                         
+                        if let selectedDataPoint {
+                            Capsule()
+                                .foregroundStyle(.orange.gradient)
+                                .frame(width: 100, height: 50)
+                                .overlay {
+                                    VStack {
+                                        Text(selectedDataPoint.formattedWeekStart)
+                                            .font(.caption)
+                                            .minimumScaleFactor(0.5)
+                                        Text("\(selectedDataPoint.count) issues")
+                                            .font(.caption)
+                                            .minimumScaleFactor(0.5)
+                                    }
+                                    .foregroundStyle(.white.gradient)
+                                    .padding(2)
+                                }
+                                .opacity(showSelectionBar ? 1.0 : 0.0)
+                                .offset(x: offsetX - 50, y: offsetY - 60)
+                        }
+                        
                         Rectangle()
                             .fill(Color.clear)
                             .contentShape(Rectangle())
@@ -88,6 +108,7 @@ struct RepositoryDetailsView: View {
                                                 if let position = proxy.position(for: (nearestPoint.weekStart, nearestPoint.count)),
                                                 let plotFrame = proxy.plotFrame {
                                                     offsetX = geometry[plotFrame].origin.x + position.x
+                                                    offsetY = geometry[plotFrame].origin.y + position.y
                                                 }
                                             }
                                         }

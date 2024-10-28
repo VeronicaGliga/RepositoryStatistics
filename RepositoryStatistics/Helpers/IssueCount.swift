@@ -13,8 +13,8 @@ struct IssueCount: Identifiable {
     let count: Int
     
     var formattedWeekStart: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        return dateFormatter.string(from: weekStart)
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d MMM yyyy"
+        return formatter.string(from: weekStart)
     }
 }
