@@ -24,10 +24,53 @@ struct MockEndpoint: Endpoint {
 }
 
 class MockNetworkingService<T: Endpoint>: NetworkingService<T> {
-    var result: Any?
-    
-    override func request<U>(_ request: T, for type: U.Type) async throws -> U where U: Decodable {
-        guard let result = result as? U else { throw NetworkError.decodingError(NSError()) }
-        return result
+    override func request<U: Decodable>(_ request: T, for type: U.Type) async throws -> U {
+        let url = baseURL.appendingPathComponent(request.path)
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = request.httpMethod.rawValue
+        
+        let (data, response) = try await session.data(for: urlRequest)
+        
+        // Check if the response is valid (status code 200-299)
+        if let httpResponse = response as? HTTPURLResponse, !(200...299).contains(httpResponse.statusCode) {
+            throw NetworkError.invalidResponse(statusCode: httpResponse.statusCode)
+        }
+        
+        if data.isEmpty {
+            throw NetworkError.noData
+        }
+        
+        do {
+            let decodedData = try JSONDecoder().decode(U.self, from: data)
+            return decodedData
+        } catch {
+            throw NetworkError.decodingError(error)
+        }
     }
 }
+
+//class MockNetworkingService<T: Endpoint>: NetworkingService<T> {
+//    var result: Result<Data, Error>?
+//    
+//    func request<U: Decodable>(_ endpoint: MockEndpoint, for type: U.Type) async throws -> U {
+//        // Check if there's a predefined result
+//        guard let result = result else {
+//            fatalError("MockNetworkingService result not set")
+//        }
+//        
+//        switch result {
+//        case .success(let data):
+//            do {
+//                // Decode the data to the expected type and return it
+//                let decodedData = try JSONDecoder().decode(U.self, from: data)
+//                return decodedData
+//            } catch {
+//                throw NetworkError.decodingError(error)
+//            }
+//            
+//        case .failure(let error):
+//            // Throw the predefined error
+//            throw error
+//        }
+//    }
+//}

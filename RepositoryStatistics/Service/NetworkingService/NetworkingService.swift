@@ -7,7 +7,7 @@
 
 import Foundation
 
-class NetworkingService<T: Endpoint> {
+class NetworkingService<T: Endpoint>: NetworkingServiceProtocol {
     // MARK: - Properties
     
     let baseURL: URL

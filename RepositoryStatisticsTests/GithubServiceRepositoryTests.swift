@@ -38,37 +38,43 @@ final class GithubServiceRepositoryTests: XCTestCase {
         githubServiceRepository = GithubServiceRepository(networkProvider: mockNetworkingService)
     }
     
-    func testFetchPublicRepositories() async throws {
+    func testFetchPublicRepositories_success() async throws {
+        // Given: a mocked response with valid repository JSON data
         let decoder = JSONDecoder()
         let expectedRepositories = try decoder.decode([Repository].self, from: repositoryJSON)
-        mockNetworkingService.result = expectedRepositories
+        
+        mockURLSession.dataToReturn = repositoryJSON
         mockURLSession.responseToReturn = HTTPURLResponse(
-            url: URL(string: "https://example.com")!,
+            url: URL(string: "https://example.com/repositories")!,
             statusCode: 200,
             httpVersion: nil,
             headerFields: nil
         )
         
+        // When: fetching public repositories
         let repositories = try await githubServiceRepository.fetchPublicRepositories()
         
+        // Then: verify that the fetched repositories match the expected data
         XCTAssertEqual(repositories.count, expectedRepositories.count)
-        
         XCTAssertTrue(repositoriesArraysAreEqual(repositories, expectedRepositories), "The fetched repositories should match the expected mock repositories")
     }
     
     func testFetchPublicRepositories_failure() async {
+        // Given: a mocked server error response
+        mockURLSession.dataToReturn = Data() // No data
         mockURLSession.responseToReturn = HTTPURLResponse(
-            url: URL(string: "https://example.com")!,
+            url: URL(string: "https://example.com/repositories")!,
             statusCode: 500,  // Simulate a bad server response
             httpVersion: nil,
             headerFields: nil
         )
         
+        // When: attempting to fetch repositories should fail
         do {
-            let result = try await githubServiceRepository.fetchPublicRepositories()
+            _ = try await githubServiceRepository.fetchPublicRepositories()
             XCTFail("Expected failure due to bad server response, but got success")
         } catch let error as NetworkError {
-            // Assert that the error is the expected `.invalidResponse` with statusCode 500
+            // Then: Assert that the error is `invalidResponse` with status code 500
             if case .invalidResponse(let statusCode) = error {
                 XCTAssertEqual(statusCode, 500, "Expected status code 500 in error, but got \(statusCode)")
             } else {
@@ -77,18 +83,19 @@ final class GithubServiceRepositoryTests: XCTestCase {
         } catch {
             XCTFail("Unexpected error type: \(error)")
         }
-        
     }
     
+    // Helper method to compare two repositories
     private func repositoriesAreEqual(_ lhs: Repository, _ rhs: Repository) -> Bool {
         return lhs.id == rhs.id &&
-               lhs.name == rhs.name &&
-               lhs.owner.id == rhs.owner.id &&
-               lhs.owner.name == rhs.owner.name &&
-               lhs.description == rhs.description &&
-               lhs.url == rhs.url
+        lhs.name == rhs.name &&
+        lhs.owner.id == rhs.owner.id &&
+        lhs.owner.name == rhs.owner.name &&
+        lhs.description == rhs.description &&
+        lhs.url == rhs.url
     }
     
+    // Helper method to compare two arrays of repositories
     private func repositoriesArraysAreEqual(_ lhs: [Repository], _ rhs: [Repository]) -> Bool {
         guard lhs.count == rhs.count else { return false }
         for (index, repo) in lhs.enumerated() {

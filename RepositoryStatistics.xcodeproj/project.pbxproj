@@ -37,6 +37,7 @@
 		D28B3FC82CCFB1D6007BFD73 /* GithubServiceIssuesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28B3FC72CCFB1D6007BFD73 /* GithubServiceIssuesTests.swift */; };
 		D28B3FCA2CCFB246007BFD73 /* GithubServiceRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28B3FC92CCFB246007BFD73 /* GithubServiceRepositoryTests.swift */; };
 		D28B3FCC2CCFBF7A007BFD73 /* NetworkingServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28B3FCB2CCFBF7A007BFD73 /* NetworkingServiceTests.swift */; };
+		D28B3FCE2CCFCB2C007BFD73 /* NetworkingServiceProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = D28B3FCD2CCFCB2C007BFD73 /* NetworkingServiceProtocol.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,6 +92,7 @@
 		D28B3FC72CCFB1D6007BFD73 /* GithubServiceIssuesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubServiceIssuesTests.swift; sourceTree = "<group>"; };
 		D28B3FC92CCFB246007BFD73 /* GithubServiceRepositoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GithubServiceRepositoryTests.swift; sourceTree = "<group>"; };
 		D28B3FCB2CCFBF7A007BFD73 /* NetworkingServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingServiceTests.swift; sourceTree = "<group>"; };
+		D28B3FCD2CCFCB2C007BFD73 /* NetworkingServiceProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingServiceProtocol.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -250,6 +252,7 @@
 				D2553C7E2CC909480070C089 /* Endpoint.swift */,
 				D2553C7A2CC901140070C089 /* NetworkingService.swift */,
 				D28B3FC52CCFB0DA007BFD73 /* URLSessionProtocol.swift */,
+				D28B3FCD2CCFCB2C007BFD73 /* NetworkingServiceProtocol.swift */,
 			);
 			path = NetworkingService;
 			sourceTree = "<group>";
@@ -391,6 +394,7 @@
 				D2553C532CC7BF0F0070C089 /* RepositoryDetailsViewModel.swift in Sources */,
 				D2553C7D2CC901DE0070C089 /* ApiTarget.swift in Sources */,
 				D2553C882CC918400070C089 /* GithubServiceIssues.swift in Sources */,
+				D28B3FCE2CCFCB2C007BFD73 /* NetworkingServiceProtocol.swift in Sources */,
 				D28B3FBA2CCF9B9A007BFD73 /* Fork.swift in Sources */,
 				D2553C552CC7C0860070C089 /* Owner.swift in Sources */,
 				D2553C7B2CC901140070C089 /* NetworkingService.swift in Sources */,
